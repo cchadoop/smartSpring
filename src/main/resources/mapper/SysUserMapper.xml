@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.smart.mapper.SysUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.smart.entity.SysUser">
+        <id column="USER_ID" property="userId" />
+        <result column="USERNAME" property="username" />
+        <result column="PASSWORD" property="password" />
+        <result column="SALT" property="salt" />
+        <result column="ACCOUNT" property="account" />
+        <result column="PHONE" property="phone" />
+        <result column="EMAIL" property="email" />
+        <result column="STATUS" property="status" />
+        <result column="VALID_TIME" property="validTime" />
+        <result column="ROLE_ID" property="roleId" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="UPDATE_TIME" property="updateTime" />
+        <result column="CREATE_USER" property="createUser" />
+        <result column="UPDATE_USER" property="updateUser" />
+        <result column="DE_FLAG" property="deFlag" />
+        <result column="BONDED_CODE" property="bondedCode" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        USER_ID, USERNAME, PASSWORD, SALT, ACCOUNT, PHONE, EMAIL, STATUS, VALID_TIME, ROLE_ID, CREATE_TIME, UPDATE_TIME, CREATE_USER, UPDATE_USER, DE_FLAG, BONDED_CODE
+    </sql>
+
+</mapper>
