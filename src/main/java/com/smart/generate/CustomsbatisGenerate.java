@@ -95,7 +95,7 @@ public class CustomsbatisGenerate {
                             .controllerBuilder().enableRestStyle().enableHyphenStyle()
                             .serviceBuilder().formatServiceFileName("%sService")
                             .mapperBuilder().enableBaseColumnList().enableBaseResultMap().enableMapperAnnotation()
-                            .entityBuilder().enableTableFieldAnnotation().enableLombok();
+                            .entityBuilder().enableTableFieldAnnotation().enableLombok().enableColumnConstant();
                 })
                 /*.injectionConfig(builder -> {
                     builder.beforeOutputFile((tableInfo, stringObjectMap)->{

@@ -3,19 +3,22 @@ package com.smart.controller;
 import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.smart.contant.enums.DeFlagEnum;
 import com.smart.entity.SysMenu;
 import com.smart.entity.vo.MenuTreeResult;
 import com.smart.service.SysMenuService;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.smart.util.ExcelUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -88,7 +91,7 @@ public class SysMenuController {
         return sysMenuService.treeMenu();
     }
 
-    @ApiOperation(value = "获取菜单树",tags = "获取菜单树")
+    @ApiOperation(value = "根据id获取菜单树",tags = "根据id获取菜单树")
     @GetMapping("treeMenu/{id}")
     private List<Tree<String>> treeMenu(@PathVariable("id")String id){
         return sysMenuService.treeMenu(id);
@@ -100,6 +103,11 @@ public class SysMenuController {
         return sysMenuService.menuTree();
     }
 
-
+    @GetMapping("exportExcel")
+    @ApiOperation(value = "导出数据",tags = "导出数据")
+    public void exportExcel(HttpServletRequest request, HttpServletResponse response){
+        List<SysMenu> list = sysMenuService.list(Wrappers.<SysMenu>lambdaQuery().isNull(SysMenu::getDeFlag));
+        ExcelUtils.createExcel(request,response,SysMenu.class,list,"菜单.xls");
+    }
 
 }
