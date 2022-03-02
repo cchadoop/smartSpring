@@ -28,7 +28,7 @@ public class FileRecordController {
     @ApiOperation(value = "导出数据",tags = "导出数据")
     public void exportExcel(HttpServletRequest request, HttpServletResponse response){
         List<SysMenu> list = sysMenuService.list(Wrappers.<SysMenu>lambdaQuery().isNull(SysMenu::getDeFlag));
-        ExcelUtils.createExcel2(request,response,SysMenu.class,list,"菜单.xls");
+        ExcelUtils.createExcelHuTool(request,response,SysMenu.class,list,"菜单.xls");
     }
 
     @GetMapping("exportExcelModule")
@@ -41,7 +41,7 @@ public class FileRecordController {
     @PostMapping("/importExcel")
     @ApiOperation(value = "导入数据",tags = "导入数据")
     public void importExcel(HttpServletRequest request, HttpServletResponse response, @RequestParam("file") MultipartFile multipartFile) throws Exception {
-        List<SysMenu> list = (List<SysMenu>) ExcelUtils.importExcel2(multipartFile, SysMenu.class);
+        List<SysMenu> list = (List<SysMenu>) ExcelUtils.importExcelHuTool(multipartFile, SysMenu.class);
         System.out.println(list);
     }
 }

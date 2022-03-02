@@ -1,5 +1,6 @@
 package com.smart.util;
 
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
@@ -28,7 +29,181 @@ import java.util.*;
 
 @Slf4j
 public class ExcelUtils {
+    /**
+     * 多sheet模板生成
+     *
+     * @param request
+     * @param response
+     * @param map      example   map  == > sysMenu,  <Class , List<SysMenu>>
+     * @param fileName
+     */
+    public static void createExcelSheet(HttpServletRequest request, HttpServletResponse response, Map<String, Map<Class, List<?>>> map, String fileName) {
+        ExcelWriter writer = ExcelUtil.getWriter();
+        Iterator<Map.Entry<String, Map<Class, List<?>>>> iterator = map.entrySet().iterator();
+        List<String> sheetNames = new ArrayList<>();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Map<Class, List<?>>> next = iterator.next();
+            String key = next.getKey();
+            sheetNames.add(key);
+            Map<Class, List<?>> value = next.getValue();
+            // 设置sheet页
+            writer.setSheet(key);
 
+            Iterator<Map.Entry<Class, List<?>>> iterator1 = value.entrySet().iterator();  // Map<Class,List<?>
+            while (iterator1.hasNext()) {
+                Map.Entry<Class, List<?>> next1 = iterator1.next();
+                Class clazz = next1.getKey();
+                List<?> value1 = next1.getValue();
+                // 获取当前类字段
+                Field[] fields = clazz.getDeclaredFields();
+                // 字段名称集合
+                List<String> fieldNames = new ArrayList<>();
+                List<String> cnNames = new ArrayList<>();
+                for (Field field : fields) {
+                    if (!field.isAccessible()) {
+                        // 关闭反射访问安全检查，为了提高速度
+                        field.setAccessible(true);
+                    }
+                    // 获取字段名称
+                    String fieldName = field.getName();
+                    // 判断哪些字段不需要输出
+                    // 判断是否有@ApiModelProperty注解
+                    boolean annotationPresent = field.isAnnotationPresent(ApiModelProperty.class);
+                    if (annotationPresent && !"deFlag".equals(fieldName) && !"createUser".equals(fieldName)
+                            && !"updateUser".equals(fieldName) && !"updateTime".equals(fieldName)) {
+                        fieldNames.add(fieldName);
+                        ApiModelProperty annotation = field.getAnnotation(ApiModelProperty.class);
+                        String name = annotation.value();
+                        cnNames.add(name);
+                    } else {
+                        //排除字段操作(如果为true，则不设置alias的字段将不被输出)
+                        writer.setOnlyAlias(true);
+                    }
+                }
+                String[] fs = fieldNames.toArray(new String[0]);
+                String[] ns = cnNames.toArray(new String[0]);
+                for (int i = 0; i < ns.length; i++) {
+                    // 设置表头及字段名
+                    writer.addHeaderAlias(fs[i], ns[i]);
+                }
+                // 自动换行
+                Workbook workbook = writer.getWorkbook();
+                StyleSet styleSet = new StyleSet(workbook);
+                styleSet.setWrapText();
+                writer.setStyleSet(styleSet);
+                writer.write(value1, true);
+                for (int i = 0; i < fieldNames.size(); i++) {
+                    writer.setColumnWidth(i, 23);
+                }
+            }
+        }
+        String mimeType = request.getServletContext().getMimeType(fileName + ".xls");
+        if (mimeType != null && !"".equals(mimeType)) {
+            response.setContentType(mimeType);
+        }
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            writer.flush(baos, true);
+            writer.close();
+            StaticFileUtils.loadToStream(new ByteArrayInputStream(baos.toByteArray()), request, response, fileName + ".xls");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 多sheet模板生成
+     *
+     * @param request
+     * @param response
+     * @param map      example   map  == > sysMenu,  <Class , List<SysMenu>>
+     * @param fileName
+     */
+    public static void createExcelSheetHuTool(HttpServletRequest request, HttpServletResponse response, Map<String, Map<Class, List<?>>> map, String fileName) {
+        ExcelWriter writer = ExcelUtil.getWriter();
+        Iterator<Map.Entry<String, Map<Class, List<?>>>> iterator = map.entrySet().iterator();
+        List<String> sheetNames = new ArrayList<>();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Map<Class, List<?>>> next = iterator.next();
+            String key = next.getKey();
+            sheetNames.add(key);
+            Map<Class, List<?>> value = next.getValue();
+            // 设置sheet页
+            writer.setSheet(key);
+
+            Iterator<Map.Entry<Class, List<?>>> iterator1 = value.entrySet().iterator();  // Map<Class,List<?>
+            while (iterator1.hasNext()) {
+                Map.Entry<Class, List<?>> next1 = iterator1.next();
+                Class clazz = next1.getKey();
+                List<?> value1 = next1.getValue();
+                // 获取当前类字段
+                Field[] fields = clazz.getDeclaredFields();
+                // 字段名称集合
+                List<String> fieldNames = new ArrayList<>();
+                List<String> cnNames = new ArrayList<>();
+                for (Field field : fields) {
+                    if (!field.isAccessible()) {
+                        // 关闭反射访问安全检查，为了提高速度
+                        field.setAccessible(true);
+                    }
+                    // 获取字段名称
+                    String fieldName = field.getName();
+                    // 判断哪些字段不需要输出
+                    // 判断是否有@ApiModelProperty注解
+                    boolean annotationPresent = field.isAnnotationPresent(ApiModelProperty.class);
+                    if (annotationPresent && !"deFlag".equals(fieldName) && !"createUser".equals(fieldName)
+                            && !"updateUser".equals(fieldName) && !"updateTime".equals(fieldName)) {
+                        fieldNames.add(fieldName);
+                        ApiModelProperty annotation = field.getAnnotation(ApiModelProperty.class);
+                        String name = annotation.value();
+                        cnNames.add(name);
+                    } else {
+                        //排除字段操作(如果为true，则不设置alias的字段将不被输出)
+                        writer.setOnlyAlias(true);
+                    }
+                }
+                String[] fs = fieldNames.toArray(new String[0]);
+                String[] ns = cnNames.toArray(new String[0]);
+                for (int i = 0; i < ns.length; i++) {
+                    // 设置表头及字段名
+                    writer.addHeaderAlias(fs[i], ns[i]);
+                }
+                // 自动换行
+                writer.write(value1, true);
+                for (int i = 0; i < fieldNames.size(); i++) {
+                    writer.setColumnWidth(i, 23);
+                }
+            }
+        }
+        String mimeType = request.getServletContext().getMimeType(fileName + ".xls");
+        if (mimeType != null && !"".equals(mimeType)) {
+            response.setContentType(mimeType);
+        }
+        try {
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        try (ServletOutputStream out = response.getOutputStream()) {
+            writer.flush(out);
+            // 关闭writer，释放内存
+            writer.close();
+            //此处记得关闭输出Servlet流
+            IoUtil.close(out);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * 单个sheet页导出
+     *
+     * @param request
+     * @param response
+     * @param clazz
+     * @param list     数据集合
+     * @param fileName 文件名
+     */
     public static void createExcel(HttpServletRequest request, HttpServletResponse response, Class clazz, List<?> list, String fileName) {
 
         // 创建ExcelWrite对象
@@ -104,8 +279,16 @@ public class ExcelUtils {
 
     }
 
-
-    public static void createExcel2(HttpServletRequest request, HttpServletResponse response, Class clazz, List<?> list, String fileName) {
+    /**
+     * 单个sheet页导出
+     *
+     * @param request
+     * @param response
+     * @param clazz
+     * @param list     数据集合
+     * @param fileName 文件名
+     */
+    public static void createExcelHuTool(HttpServletRequest request, HttpServletResponse response, Class clazz, List<?> list, String fileName) {
         // 创建ExcelWrite对象
         // 生成xls文件
         // flase HSSFWorkbook xls 2003
@@ -180,7 +363,16 @@ public class ExcelUtils {
         }
     }
 
-    public static List<?> importExcel2(MultipartFile file, Class<?> clazz) throws Exception {
+
+    /**
+     * hutool 导入excel
+     *
+     * @param file  文件
+     * @param clazz 转换实体
+     * @return
+     * @throws Exception
+     */
+    public static List<?> importExcelHuTool(MultipartFile file, Class<?> clazz) throws Exception {
         InputStream inputStream = file.getInputStream();
         // 2.应用HUtool ExcelUtil获取ExcelReader指定输入流和sheet
         ExcelReader reader = ExcelUtil.getReader(inputStream, 0);
@@ -218,6 +410,14 @@ public class ExcelUtils {
     }
 
 
+    /**
+     * poi 导入excel
+     *
+     * @param multipartFile
+     * @param clazz
+     * @return
+     * @throws Exception
+     */
     public static List<T> importExcel(MultipartFile multipartFile, Class clazz) throws Exception {
         Workbook workbook = null;
         //实例对象
