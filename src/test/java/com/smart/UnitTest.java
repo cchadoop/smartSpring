@@ -27,6 +27,9 @@ public class UnitTest {
 
     }
 
+    /**
+     * 测试hutool excel导入
+     */
     @Test
     public void testExcel(){
         ExcelReader reader = ExcelUtil.getReader("C:\\Users\\13182\\Desktop\\菜单.xls");
@@ -56,8 +59,8 @@ public class UnitTest {
         String[] fs = fieldNames.toArray(new String[0]);
         String[] ns = cnNames.toArray(new String[0]);
         for (int i = 0; i < ns.length; i++) {
-            // 设置表头及字段名
-            reader.addHeaderAlias(fs[i], ns[i]);
+            // 设置表头及字段名  与导出时相反
+            reader.addHeaderAlias(ns[i], fs[i]);
         }
         List<SysMenu> all = reader.readAll(SysMenu.class);
         System.out.println(all);

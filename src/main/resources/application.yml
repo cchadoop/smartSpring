@@ -1,6 +1,6 @@
 server:
   port: 9712
-  name: smartLearn
+  name: smartSpring
 
 # 自定义jwt key
 jwt:
