@@ -11,7 +11,12 @@ public enum SmartExceptionEnum {
     NEED_LOGIN(10007,"用户未登录！"),
     NEED_ADMIN(10008,"无管理员权限！"),
     UPDATE_FAILED(10008,"更新用户信息失败！"),
-    SYSTEM_ERROR(20001,"系统异常！");
+    SYSTEM_ERROR(20001,"系统异常！"),
+
+
+    // 替代符
+    DATE_FORMAT(50001,"时间格式有误:{0}");
+
 
     //异常码
     Integer code;
