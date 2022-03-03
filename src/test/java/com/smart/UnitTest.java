@@ -3,15 +3,45 @@ package com.smart;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.smart.entity.SysMenu;
+import com.smart.entity.SysUser;
 import io.swagger.annotations.ApiModelProperty;
 import org.junit.jupiter.api.Test;
 
+import java.io.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UnitTest {
+
+
+    /**
+     * 读取静态资源
+     */
+    @Test
+    public void testResource() {
+        String jsonStr = "";
+        try {
+            String path = this.getClass().getClassLoader().getResource("json/sys_user.json").getPath();
+            File file = new File(path);
+            FileReader fileReader = new FileReader(file);
+            Reader reader = new InputStreamReader(new FileInputStream(file), "UTF-8");
+            int ch = 0 ;
+            StringBuffer sb = new StringBuffer();
+            while ( (ch=reader.read())!=-1){
+                sb.append((char) ch);
+            }
+            fileReader.close();
+            reader.close();
+            jsonStr = sb.toString();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        List<SysUser> list = JSONArray.parseArray(jsonStr, SysUser.class);
+        System.out.println(list);
+    }
 
     @Test
     public void testPair() {
